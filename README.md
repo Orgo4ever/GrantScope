@@ -14,6 +14,22 @@ A researcher can describe an early-stage idea in plain language, find comparable
 
 **Tech stack:** Python · pandas · NumPy · scikit-learn · TF-IDF · cosine similarity · Streamlit · Tableau · Git/GitHub
 
+## Project Preview
+
+### Research Discovery Application
+
+The Streamlit application identifies comparable funded research projects
+and explains the relevance of each recommendation.
+
+![GrantScopeAI research recommendations](screenshots/grantscope-streamlit-2.png)
+
+### Interactive Funding Landscape Dashboard
+
+The Tableau dashboard explores research funding activity,
+publication momentum, and leading research organisations.
+
+![GrantScopeAI Tableau dashboard](screenshots/grantscope-tableau.png)
+
 > **Scope:** This is an exploratory tool built from **2021–2025 historical data**, not a live grant-opportunity service or a model that predicts funding success.
 
 ## Project at a glance
