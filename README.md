@@ -8,8 +8,8 @@ A researcher can describe an early-stage idea in plain language, find comparable
 
 **Explore the project**
 
-- **Live Streamlit application:** *[Add your Streamlit Community Cloud URL]*
-- **Interactive Tableau dashboard:** *[Add your Tableau Public URL]*
+- **Live Streamlit application:** *https://orgo4ever-grantscope-app-advanced-features-uwichh.streamlit.app/*
+- **Interactive Tableau dashboard:** *https://public.tableau.com/views/FundingDashboard_17860075845690/FundingLandscapeDashboard?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link*
 - **Source code and notebooks:** [GitHub repository](https://github.com/Orgo4ever/GrantScope)
 
 **Tech stack:** Python · pandas · NumPy · scikit-learn · TF-IDF · cosine similarity · Streamlit · Tableau · Git/GitHub
