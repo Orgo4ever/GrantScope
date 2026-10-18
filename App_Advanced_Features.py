@@ -64,7 +64,7 @@ st.markdown(
 st.info(
     "GrantScope is a research-discovery and decision-support tool. "
     "Similarity scores measure how closely a concept matches historical "
-    "funded projects — they are not estimates of funding probability."
+    "funded projects, they are not estimates of funding probability."
 )
 
 # ---------------------------------------------------
