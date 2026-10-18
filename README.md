@@ -1,193 +1,121 @@
-## Project Status
-
-Completed:
-
-- NSF data extraction and cleaning
-- CORDIS data cleaning
-- OpenAlex topic-year publication data
-- cross-source integration and validation
-- exploratory data analysis
-- Tableau-ready analytical outputs
-- TF-IDF similarity model
-- context-aware hybrid ranking
-- manual benchmark and generalization testing
-- exported and validated model package
-- working Streamlit similarity-search MVP
-- source, topic, year, and recommendation-count filters
-- explainable recommendation cards
-
-In progress:
-
-- final interface refinement
-- Tableau dashboard completion
-- final documentation and screenshots
-- presentation development
-- deployment preparation
-
 # GrantScopeAI
-GrantScopeAI is a Streamlit research-intelligence tool that combines CORDIS, NSF, and OpenAlex data to explore funding trends, assess research momentum, and recommend similar funded projects using TF-IDF text similarity.
 
-## Project Problem
+### From a research idea to evidence from previously funded projects
 
-Researchers and research-support teams often search grant databases, funder websites, and publication indexes separately. This makes it difficult to see how a topic is funded across regions, which institutions are active, whether research activity is growing, and which funded projects are most comparable to a new concept. GrantScopeAI consolidates those signals into one exploratory interface.
+**GrantScopeAI** is a research-intelligence and decision-support project for exploring AI-enabled chemistry and materials research. It combines historical grant records from the **U.S. National Science Foundation (NSF)** and **CORDIS** with publication-activity context from **OpenAlex**.
 
-## Intended User
+A researcher can describe an early-stage idea in plain language, find comparable funded projects, inspect *why* they matched, shortlist and compare examples, and explore relevant research areas, recipient organisations, and funding programmes. A companion **Tableau dashboard** shows the wider funding and publication landscape.
 
-GrantScopeAI is designed for a researcher or university research-support professional assessing how to position an early grant concept.
+**Explore the project**
 
-## Primary User Story
+- **Live Streamlit application:** *[Add your Streamlit Community Cloud URL]*
+- **Interactive Tableau dashboard:** *[Add your Tableau Public URL]*
+- **Source code and notebooks:** [GitHub repository](https://github.com/Orgo4ever/GrantScope)
 
-As a researcher developing an AI-enabled chemistry or materials proposal, I want to compare my concept with recent funded projects and publication trends so that I can identify relevant funders, refine my positioning, and document the evidence behind my choices.
+**Tech stack:** Python · pandas · NumPy · scikit-learn · TF-IDF · cosine similarity · Streamlit · Tableau · Git/GitHub
 
-## Core Decision Supported
+> **Scope:** This is an exploratory tool built from **2021–2025 historical data**, not a live grant-opportunity service or a model that predicts funding success.
 
-Where does a proposed AI-enabled chemistry or materials topic fit within recent funding and publication activity?
-# Raw Data
+## Project at a glance
 
-Raw source datasets are stored locally and are not committed to GitHub
-because of their size.
+| Measure | Result |
+|---|---:|
+| Integrated NSF and CORDIS funding records | **3,339** |
+| NSF awards | 2,664 |
+| CORDIS projects | 675 |
+| Documents in the similarity-search catalogue | **2,943** |
+| Research topics in the shared taxonomy | 8, plus a fallback category |
+| OpenAlex topic-year observations | 40 |
+| Data-quality checks | **19 passed; 1 informational review** |
+| Analysis period | 2021–2025 |
 
-Expected sources:
+*The 2,943 searchable documents are the model's deduplicated retrieval catalogue; the integrated funding dataset retains 3,339 source records.*
 
-- NSF Award Search API
-- OpenAlex API
-- CORDIS Horizon Europe and Horizon 2020 data
+## The problem
 
-The acquisition process is documented in the source-validation notebook.
+Researchers and research-support teams often need to consult separate grant databases, funding websites, and publication indexes to understand the landscape around a new idea. That makes it difficult to answer connected questions:
 
-## Data preparation
+- Has comparable work already received funding?
+- Which organisations and funding programmes appear in related projects?
+- How has funding activity changed across research areas and years?
+- Is publication activity growing alongside grant activity?
+- Which historical projects are useful starting points for further investigation?
 
-GrantScopeAI combines three complementary data sources:
+**GrantScopeAI brings these signals into a common analytical workflow.** Its purpose is to support research orientation and evidence-based exploration—not to assess proposal eligibility, guarantee novelty, or estimate the probability of obtaining a grant.
 
-- **CORDIS** — European Union Horizon Europe research projects;
-- **NSF Awards** — United States research awards;
-- **OpenAlex** — publication activity and research-momentum context.
+## What I built
 
-The shared analysis period is **2021–2025**.
+### 1. An interactive research-discovery app (Streamlit)
 
-### Funding-data preparation
+The application supports a four-step workflow:
 
-The NSF and CORDIS datasets are standardized to one row per unique grant or project.
+1. **Describe a research concept.** Enter a natural-language description and optionally filter by funding source, topic, award year, or number of results.
+2. **Review similar funded projects.** Inspect ranked NSF/CORDIS records with a relevance score, matching explanation, shared concepts, project summary, funding metadata, and link to the original source.
+3. **Save and compare.** Add projects to a session shortlist, compare up to three side-by-side, and download the shortlist or comparison as CSV.
+4. **Explore starting points.** See related topics, recipient organisations, funding programmes, and historically funded projects based on the current results.
 
-- CORDIS participant and consortium records are aggregated to the project level.
-- Repeated NSF extraction records are consolidated using the NSF award ID.
-- Original source identifiers and URLs are retained for traceability.
-- Dates, funding amounts, organisations, programmes, and descriptive text are standardized.
+Relevance is a **model-specific similarity score**, not a funding-success probability. The app also explains the limitations of historical grant data.
 
-### Funding relevance tiers
+### 2. A funding-landscape dashboard (Tableau)
 
-NSF and CORDIS records are classified using AI and chemistry/materials keyword rules:
+The companion dashboard lets users explore:
 
-- `core_match` — higher-confidence records passing the refined relevance filter;
-- `broad_match` — potentially relevant records passing the broader high-recall filter;
-- `out_of_scope` — records retained in full local datasets but excluded from candidate outputs.
+- Unique funded-project counts and represented research topics.
+- NSF funding (**USD**) and CORDIS funding (**EUR**), shown separately.
+- Annual grant activity by topic.
+- Grant counts by research topic and funding source.
+- Topic momentum: grant activity in the context of publication growth.
+- Leading funding programmes and recipient organisations.
 
-Extraction-query labels are not used for relevance classification, preventing circular classification decisions.
+Interactive selections filter compatible views by topic, year, or organisation. The dashboard uses several prepared datasets at different levels of aggregation, so some fixed-period measures intentionally do **not** respond to every filter.
 
-### Current funding candidate datasets
+### 3. An end-to-end analytical pipeline
 
-| Source | Core matches | Broad matches | Total candidates |
+The project covers public-data acquisition, cleaning, harmonisation, feature engineering, validation, exploratory analysis, similarity ranking, and delivery through interactive tools.
+
+```text
+NSF Awards API ---------┐
+                        ├─> Clean + harmonise grants ─> Integrated grant table
+CORDIS project files ---┘                                  │
+                                                           ├─> Tableau analytical outputs
+OpenAlex API ─> Topic/year publication activity ──────────┘
+                                                           │
+Integrated grant text ─> TF-IDF + hybrid ranking ─> Search catalogue
+                                                           │
+Research concept ──────────────────────────────────> Streamlit app
+```
+
+NSF and CORDIS are **appended**, not joined, because they describe different funded projects and do not share a common project identifier. OpenAlex remains at the **topic-year** level rather than being treated as another source of individual grants.
+
+## Data sources and preparation
+
+| Source | Role | Processing |
+|---|---|---|
+| **NSF Awards API** | U.S. award records | Monthly queries and pagination; duplicate award records consolidated; fields cleaned and standardised. |
+| **CORDIS** | EU-funded project and organisation data | Project, participant/organisation, and research-vocabulary files combined; participant-level information aggregated to the project level. |
+| **OpenAlex API** | Publication activity by research topic | Topic-year counts and growth indicators prepared separately from grant-level records. |
+
+The raw NSF extraction reached **33,125 rows across 70 columns** before relevance filtering and subsequent processing. The final harmonised funding table contains **3,339 unique records across 25 application-ready fields**.
+
+### Relevance filtering
+
+Funding records were assessed using AI and chemistry/materials keyword rules independent of the original extraction-query labels:
+
+| Source | `core_match` | `broad_match` | Total candidates |
 |---|---:|---:|---:|
 | CORDIS | 416 | 259 | 675 |
 | NSF | 1,757 | 907 | 2,664 |
 | **Combined** | **2,173** | **1,166** | **3,339** |
 
-### OpenAlex publication context
+- **`core_match`**: Records satisfying the more selective relevance criteria.
+- **`broad_match`**: Potentially useful records retained by broader, higher-recall criteria.
+- **`out_of_scope`**: Records kept in the full local extracts but excluded from the candidate dataset.
 
-OpenAlex is stored separately from grant-level records because it has a different analytical grain.
+Source identifiers and original URLs were retained for traceability. Unique integrated keys use prefixes such as `NSF_<award_id>` and `CORDIS_<project_id>`.
 
-The processed dataset contains:
+### Shared research-topic taxonomy
 
-- 40 unique topic-year records;
-- eight selected research topics;
-- complete annual coverage from 2021 through 2025;
-- no duplicate topic-year combinations;
-- no missing or negative publication counts.
-
-Publication momentum is represented using:
-
-- annual publication counts;
-- year-over-year growth;
-- a 2021 baseline index;
-- total growth from 2021 to 2025;
-- compound annual growth rate.
-
-OpenAlex topic counts are compared within topics rather than summed together because the search queries may overlap. Publication growth is treated as evidence of research activity, not as proof of research quality or future funding availability.
-
-### Processed outputs
-
-#### CORDIS
-
-- compact CORDIS candidate dataset containing 675 projects;
-- full enriched CORDIS dataset retained locally.
-
-#### NSF
-
-- `nsf_candidate_awards_compact_2021_2025.csv`;
-- 2,664 candidate awards across 27 application-ready fields;
-- full cleaned and diagnostic datasets retained locally.
-
-#### OpenAlex
-
-- `openalex_topic_year_clean_2021_2025.csv`;
-- `openalex_topic_momentum_summary_2021_2025.csv`;
-- `openalex_cleaning_validation_summary.csv`.
-
-### Data storage
-
-Large raw and enriched datasets are stored locally and excluded from GitHub through `.gitignore`.
-
-The repository contains compact processed outputs intended for:
-
-- Python analysis;
-- Tableau dashboards;
-- the Streamlit application;
-- cross-source integration.
-
-Detailed cleaning decisions and validation steps are documented in:
-
-- `Notebooks/02_cordis_cleaning.ipynb`;
-- `Notebooks/03_nsf_cleaning.ipynb`;
-- `Notebooks/04_openalex_preparation.ipynb`;
-- the project decision log.
-
-## Integrated data model
-
-The processed NSF and CORDIS candidate datasets have been standardized into a shared grant-level structure.
-
-The integrated funding table contains:
-
-- **3,339 unique funding records**;
-- **675 CORDIS projects**;
-- **2,664 NSF awards**;
-- **25 application-ready columns**;
-- no duplicate global grant identifiers;
-- complete coverage within the 2021–2025 project period.
-
-NSF and CORDIS are appended rather than joined because they represent separate funded activities and do not share identifiers.
-
-Source-prefixed grant keys are used to maintain global uniqueness:
-
-- `CORDIS_<project_id>`;
-- `NSF_<award_id>`.
-
-### Funding definitions
-
-The primary funding amount depends on the source:
-
-- **CORDIS:** maximum EU contribution, reported in EUR;
-- **NSF:** estimated total award value, reported in USD.
-
-Additional source-specific financial fields are retained:
-
-- CORDIS total project cost;
-- NSF obligated funding.
-
-EUR and USD values remain separate. No cross-currency totals are calculated because an exchange-rate methodology has not been defined.
-
-## Shared research-topic taxonomy
-
-Funding records are mapped to the same eight research topics used in the OpenAlex publication dataset:
+A transparent, priority-based taxonomy groups the funding records into eight AI-enabled chemistry/materials areas:
 
 1. Autonomous laboratories
 2. Reaction prediction
@@ -198,231 +126,132 @@ Funding records are mapped to the same eight research topics used in the OpenAle
 7. AI-enabled materials
 8. AI-enabled chemistry
 
-Topic assignments use transparent keyword rules applied to grant titles, abstracts, programmes, and funding-mechanism text where available.
+Rules use available grant titles, descriptions, programmes, and related metadata. Each grant receives a `primary_topic` as well as any additional matched topics.
 
-Each grant contains:
+- **2,239** grants matched at least one named topic.
+- **3,245** grant-topic relationships were identified.
+- **1,100** grants remained in **Other AI-enabled chemistry/materials** rather than receiving an unsupported specific label.
 
-- a priority-based `primary_topic`;
-- all matched topics in `matched_topics`;
-- the number of named topic matches.
+Because one grant can match multiple topics, topic-level totals should not be summed and interpreted as unique grants.
 
-Final topic coverage includes:
+### Topic-year and publication context
 
-- **2,239 grants** assigned to at least one named topic;
-- **3,245 grant-topic relationships**;
-- **1,100 grants** retained under `Other AI-enabled chemistry/materials`.
+The funding pipeline builds an **80-row source × topic × year grid** (2 funding sources × 8 topics × 5 years), retaining zero-activity combinations. A separate **40-row topic-year context table** aligns grant activity with OpenAlex publication counts and growth metrics.
 
-The fallback category prevents weak or unsupported topic assignments.
+The OpenAlex table contains eight topics across 2021–2025, with no duplicate topic-year combinations or missing/negative publication counts. Indicators include year-over-year growth, a 2021 baseline index, 2021–2025 total growth, and compound annual growth rate.
 
-Because individual grants may match multiple topics, counts and funding totals across topics should not be added together as unique-grant totals.
+OpenAlex topic searches can overlap, so publication counts are compared **within topics** rather than summed into a single cross-topic publication total. Publication growth indicates research activity; it does not establish research quality or future funding availability.
 
-## Topic-year analytical tables
+## Data quality and governance
 
-Two topic-year structures support later analysis and dashboarding.
+Data quality was treated as a core deliverable, not an afterthought. The integrated validation framework contains **20 rules** addressing:
 
-### Funding topic-year summary
+- Row-count reconciliation and globally unique grant identifiers.
+- Completeness and consistency of analytical fields.
+- Dates, funding values, currencies, and source URLs.
+- Relevance-tier and taxonomy values.
+- Duplicate grant-topic relationships.
+- Complete OpenAlex topic-year coverage and cross-source taxonomy alignment.
 
-The complete funding grid contains:
+**Validation result: 19 passed; one informational item flagged for review.** The review concerns grants deliberately retained in the fallback topic category, not a failed data-processing operation.
 
-- eight topics;
-- five years from 2021 through 2025;
-- two funding sources;
-- **80 source-topic-year rows**.
+A data dictionary and source-to-target schema crosswalk document field definitions, data types, availability, transformation logic, nullability, and interpretation constraints.
 
-Combinations with no observed grants are represented explicitly with zero grant counts and zero total funding.
+Two design decisions are especially important:
 
-### Three-source context table
+- **Preserve funding definitions.** NSF uses estimated total awards in **USD**; CORDIS uses EU contributions in **EUR**. The dashboard does not sum these into a misleading combined amount.
+- **Preserve analytical grain.** Grant-level data, organisation/programme summaries, and topic-year publication measures remain separate where combining them would create duplication or imply unsupported comparisons.
 
-The funding summaries are aligned with OpenAlex at the topic-year level.
+## Similarity model: explainable retrieval, not prediction
 
-The resulting **40-row context table** contains:
+The final search system uses **normalised, title-weighted TF-IDF**, **cosine similarity**, and additional context-aware ranking signals. These signals consider scientific domain, chemistry/reaction context, research workflow, and clearly unrelated application areas. Similar project-title families are diversified so closely related award records do not overwhelm the results.
 
-- CORDIS grant counts and EUR funding;
-- NSF grant counts and USD funding;
-- OpenAlex publication counts and growth metrics.
+A user's concept is transformed into the fitted TF-IDF feature space, compared with historical funded projects, and ranked. Result cards present the score alongside readable evidence for the match.
 
-OpenAlex remains separate from individual grant records because it measures publication activity rather than funding awards.
+### Model iteration and evaluation
 
-## Data quality and documentation
+Five approaches were explored:
 
-The integrated quality report contains **20 validation rules** covering:
+1. Initial TF-IDF.
+2. Normalised, title-weighted TF-IDF.
+3. Concept-aware hybrid ranking.
+4. Field-aware hybrid ranking.
+5. **Context-aware hybrid ranking (selected).**
 
-- source row-count reconciliation;
-- unique grant identifiers;
-- field completeness;
-- valid dates, amounts, currencies, and URLs;
-- relevance-tier values;
-- grant-topic relationship uniqueness;
-- OpenAlex topic-year completeness;
-- taxonomy alignment across sources.
+On a small, manually reviewed **eight-project demonstration benchmark** (seven relevant examples and one weak comparison), the selected approach showed more useful ranking separation:
 
-Results:
+- **3 of 7** relevant examples ranked in the top 25.
+- **5 of 7** ranked in the top 50.
+- The best strong match moved from **rank 54 to rank 14**.
+- The weak drug-discovery comparison moved down to **rank 212**.
+- All seven relevant examples ranked above that weak comparison.
 
-- **19 rules passed**;
-- **1 informational rule requires review**.
+Additional queries covering catalyst discovery, sustainable polymers, and autonomous reaction laboratories produced distinct, explainable project results. The packaged catalogue, vectoriser, sparse matrix, configuration, and evaluation outputs also passed **eight reload/validation checks**.
 
-The review result represents grants intentionally retained in the fallback topic category and does not indicate failed processing.
+**Evaluation caveat:** This was a small, query-specific relevance check, **not** a statistically representative accuracy or production-performance estimate. The tool has no reliable dataset of rejected proposals and therefore does **not** attempt to predict funding success.
 
-A formal data dictionary and schema crosswalk document:
+## Exploratory findings
 
-- column definitions;
-- source availability;
-- data types;
-- transformation logic;
-- nullability;
-- interpretation limitations.
+The 2021–2025 analysis suggested several patterns **within the selected dataset and research taxonomy**:
 
-## Integrated processed outputs
+- **AI-enabled materials and chemistry** had the largest combined funding and publication footprints.
+- **AI-enabled catalysis** combined substantial grant activity with strong publication momentum.
+- **Autonomous laboratories** showed particularly rapid *relative* publication growth while remaining smaller in absolute funding activity.
+- **Materials informatics and reaction prediction** showed publication growth alongside comparatively lower recent grant activity.
+- NSF and CORDIS differed in programme structure, organisation coverage, geography, and award-value definitions.
 
-The following files are stored in:
+These are descriptive, dataset-specific insights. They are not causal findings or forecasts of future awards.
+
+## Repository guide
 
 ```text
-Data/Processed_Data/Integrated/
+GrantScope/
+├── App_Advanced_Features.py    # Main Streamlit application
+├── App.py                      # Earlier application version
+├── requirements.txt            # Streamlit Cloud / local dependencies
+├── src/                        # Model-loading and search logic
+├── Notebooks/                  # Acquisition, cleaning, analysis, modelling
+├── Data/                       # Compact processed analytical datasets
+├── Models/                     # Saved retrieval model assets
+├── Tableau Files/              # Tableau workbook and related files
+├── Visualizations/             # Exported visual assets
+└── Presentations/              # Project presentation materials
+```
 
-## EDA summary
+Key notebooks include `Notebooks/02_cordis_cleaning.ipynb`, `Notebooks/03_nsf_cleaning.ipynb`, `Notebooks/04_openalex_preparation.ipynb`, and `Notebooks/07_similarity_model.ipynb`.
 
-The exploratory analysis identified several useful research-intelligence patterns:
+Large raw/enriched extracts are **not** included in the public repository. Compact processed datasets and the deployed app's required model assets are provided where appropriate; original records can be consulted using retained source links.
 
-- AI-enabled materials and chemistry have the largest funding and publication footprints.
-- AI-enabled catalysis combines strong publication momentum with substantial grant activity.
-- Autonomous laboratories shows the fastest relative publication growth but remains small in absolute funding volume.
-- Materials informatics and reaction prediction show publication growth alongside lower recent grant activity.
-- NSF and CORDIS differ in their programme, organisation, geographic, and award-value structures.
-- Status fields are useful as source-specific filters but are not directly comparable.
+## Run the app locally
 
-A manually reviewed demonstration set was created for the similarity model, and ten validated EDA outputs were exported for Tableau, Streamlit, and Notebook 07.
+Clone the repository, install the dependencies, and start the Streamlit application:
 
-The next step is to build and evaluate the explainable project-similarity model.
+```bash
+git clone https://github.com/Orgo4ever/GrantScope.git
+cd GrantScope
+python -m pip install -r requirements.txt
+python -m streamlit run App_Advanced_Features.py
+```
 
-## 2026-08-03 — Select context-aware hybrid similarity model
+Use a virtual environment if preferred. The app expects the saved model assets and accompanying files to remain in their repository-relative locations. The public Streamlit deployment uses the same application entry point.
 
-### Decision
+## Limitations and responsible use
 
-GrantScopeAI will use a context-aware hybrid recommendation model combining:
+- **Historical scope:** Records cover 2021–2025; historical programmes are not necessarily open now.
+- **Not a funding prediction:** Ranking scores indicate model-specific similarity, not the probability of receiving funding.
+- **Different funding conventions:** NSF estimated awards and CORDIS EU contributions are not directly interchangeable, and their currencies are not aggregated.
+- **Metadata quality:** Public descriptions, organisation names, and programme information may be incomplete or inconsistent.
+- **Topic simplification:** Rule-based categories support exploration but cannot fully represent interdisciplinary research.
+- **Lexical retrieval:** TF-IDF is efficient and interpretable but may miss semantically related projects expressed with different terminology.
+- **Comparability:** Publication topics can overlap; dashboard views use different grains and have intentionally limited cross-filtering.
+- **Independent verification:** Users must check current programme eligibility, deadlines, award conditions, and scientific novelty against original sources.
 
-- normalized, title-weighted TF-IDF;
-- cosine similarity;
-- scientific-domain evidence;
-- broader chemistry and reaction context;
-- research-workflow coverage;
-- a small penalty for clearly unrelated application areas;
-- project-title diversification to prevent collaborative award families from dominating the results.
+Possible future work includes larger-scale retrieval evaluation, semantic embedding comparisons, and a separately verified layer for currently open funding opportunities.
 
-The model searches 2,943 unique modelling documents while preserving links to all 3,339 original grant records.
+## Project context
 
-### Rationale
+**Project type:** Independent final project for the Ironhack Data Analytics Bootcamp (2026).  
+**Focus:** Data integration, quality validation, exploratory analytics, explainable information retrieval, and decision-support visualisation.  
+**Author:** Kyle Haustein.
 
-A simple keyword-overlap baseline was transparent but gave equal importance to common and distinctive terms.
-
-The initial TF-IDF model improved term weighting, but its ranking did not align sufficiently with the manually reviewed benchmark. Several relevant chemistry projects ranked below a weaker drug-discovery example.
-
-Successive model versions were evaluated:
-
-1. Initial TF-IDF
-2. Normalized, title-weighted TF-IDF
-3. Concept-aware hybrid
-4. Field-aware hybrid
-5. Context-aware hybrid
-
-The context-aware hybrid produced the clearest separation between relevant and off-domain projects:
-
-- 3 of 7 relevant projects ranked in the top 25;
-- 5 of 7 ranked in the top 50;
-- the best strong match improved from rank 54 to rank 14;
-- the weak drug-discovery comparison fell to rank 212;
-- all 7 relevant projects ranked above the weak comparison.
-
-### Validation
-
-The final model was tested with three distinct research concepts:
-
-- machine-learning-guided catalyst discovery;
-- sustainable polymer materials;
-- autonomous reaction laboratories.
-
-Each query returned five unique project families with explainable shared terms.
-
-The exported catalogue, vectorizer, sparse matrix, configuration, and evaluation files were independently reloaded. All 8 validation checks passed.
-
-### Limitations
-
-The eight-project manual benchmark is small and query-specific. It is used as a qualitative retrieval check rather than a formal accuracy estimate.
-
-The model identifies similar funded research projects. It does not predict funding success or proposal acceptance because rejected-proposal data are not available.
-
-Further tuning against the same benchmark was avoided to reduce overfitting.
-
-### Consequences
-
-The selected model is explainable, computationally lightweight, and suitable for deployment in Streamlit.
-
-Each recommendation can display:
-
-- similarity and final ranking scores;
-- shared scientific terms;
-- domain, context, and workflow evidence;
-- source, programme, organisation, year, and funding metadata;
-- links back to the original grant record.
-## Tableau Dashboard
-
-An interactive Tableau dashboard was developed to explore funding activity and research momentum across AI-enabled chemistry and materials topics.
-
-### Dashboard views
-
-The dashboard currently includes:
-
-- Unique funded-project count
-- Number of research topics represented
-- NSF funding shown in USD
-- CORDIS funding shown in EUR
-- Grant activity versus publication momentum by topic
-- Annual grant activity by topic
-- Grant activity by topic and funding source
-- Top funding programmes
-- Top funded organisations
-
-### Interactivity
-
-The dashboard includes the following controls:
-
-- Funding source filter
-- Primary topic filter
-- Award-year filter
-- Interactive topic selection from the momentum scatter plot
-
-Selecting a topic bubble in the momentum chart filters the compatible dashboard views to the selected research topic. Clicking blank space in the momentum chart restores the complete dashboard.
-
-Because the Tableau worksheets use multiple prepared CSV files at different levels of aggregation, separate dashboard filter actions were created for the different target data sources.
-
-### Filter limitations
-
-Not every filter applies to every view:
-
-- The year filter applies to views containing annual or grant-level records.
-- The momentum chart contains fixed 2022–2025 growth calculations and is therefore not recalculated by the year filter.
-- The top-programme and top-organisation datasets are aggregated across the full 2021–2025 period.
-- Source filtering is unavailable for views whose prepared datasets do not include source-level records.
-
-These limitations are intentional and prevent the dashboard from implying that fixed-period metrics were dynamically recalculated.
-
-### Currency treatment
-
-NSF and CORDIS funding are intentionally displayed separately:
-
-- NSF amounts are shown in USD.
-- CORDIS amounts are shown in EUR.
-- USD and EUR values are never summed into one combined funding measure.
-
-This also reflects differences between NSF estimated award totals and CORDIS European Commission contributions.
-
-### Current dashboard status
-
-The dashboard structure, charts, KPI cards, filters, and primary topic-selection actions are functional.
-
-Remaining visual-polish work includes:
-
-- Standardising the dashboard color palette
-- Applying consistent NSF and CORDIS colors
-- Refining dashboard backgrounds and spacing
-- Reviewing font sizes, legends, and tooltips
-- Completing a final interaction and presentation-mode test
+The project demonstrates the complete path from fragmented public datasets to a validated analytical model and an interactive tool designed around a real research-support workflow.
